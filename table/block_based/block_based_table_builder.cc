@@ -452,9 +452,10 @@ struct BlockBasedTableBuilder::Rep {
         flush_block_policy(
             table_options.flush_block_policy_factory->NewFlushBlockPolicy(
                 table_options, data_block)),
+        is_bottommost(tbo.is_bottommost),
         status_ok(true),
-        io_status_ok(true),
-        is_bottommost(tbo.is_bottommost) {
+        io_status_ok(true)
+        {
     if (tbo.target_file_size == 0) {
       buffer_limit = compression_opts.max_dict_buffer_bytes;
     } else if (compression_opts.max_dict_buffer_bytes == 0) {
@@ -1291,7 +1292,8 @@ void BlockBasedTableBuilder::WriteRawBlock(const Slice& block_contents,
     switch (r->table_options.prepopulate_block_cache) {
       case BlockBasedTableOptions::PrepopulateBlockCache::kFlushAndCompaction:
         // Only populate the block cache if the file created is not at the bottommost level
-        warm_cache = r->is_bottommost == false && (r->reason == TableFileCreationReason::kFlush || r->reason == TableFileCreationReason::kCompaction);
+        //warm_cache = r->is_bottommost == false && (r->reason == TableFileCreationReason::kFlush || r->reason == TableFileCreationReason::kCompaction);
+        warm_cache = (r->reason == TableFileCreationReason::kFlush || r->reason == TableFileCreationReason::kCompaction);
         break;
       case BlockBasedTableOptions::PrepopulateBlockCache::kFlushOnly:
         warm_cache = (r->reason == TableFileCreationReason::kFlush);
